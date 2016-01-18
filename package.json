@@ -1,0 +1,15 @@
+{
+  "name": "wy_music_signin",
+  "version": "0.0.1",
+  "description": "网易云音乐自动签到机器人",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zhuping.zp",
+  "license": "MIT",
+  "dependencies": {
+    "big-integer": "~1.6.10",
+    "superagent": "~1.6.1"
+  }
+}
