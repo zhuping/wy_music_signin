@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "big-integer": "~1.6.10",
+    "cron": "~1.1.0",
     "superagent": "~1.6.1"
   }
 }

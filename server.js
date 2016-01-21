@@ -1,3 +1,4 @@
+var CronJob = require('cron').CronJob;
 var request = require('superagent');
 var crypto = require('./crypto');
 
@@ -79,17 +80,19 @@ function sign(callback) {
   }
 }
 
-
-login(PHONE, PASSWORD, function(error) {
-  if (error) {
-    console.log(error.msg);
-    return;
-  }
-
-  sign(function(error, data) {
+new CronJob('00 30 11 * * 0-6', function() {
+  login(PHONE, PASSWORD, function(error) {
     if (error) {
       console.log(error.msg);
       return;
     }
+    sign(function(error, data) {
+      if (error) {
+        console.log(error.msg);
+        return;
+      }
+    });
   });
-});
+}, function() {
+  console.log('something goes error.');
+}, true, 'Asia/Shanghai');
