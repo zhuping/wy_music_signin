@@ -1,6 +1,7 @@
 var request = require('superagent');
 var crypto = require('./crypto');
 
+var cookie;
 var PHONE = 'YOUR_ACCOUNT';
 var PASSWORD = 'YOUR_PASSWORD';
 var header = {
@@ -21,7 +22,7 @@ var httpRequest = function(method, url, data, callback) {
   } else {
     ret = request.get(url).query(data);
   }
-  // if (cookie) ret.set('Cookie', cookie);
+  if (cookie) ret.set('Cookie', cookie);
   ret.set(header).timeout(10000).end(callback);
 }
 
@@ -48,18 +49,18 @@ function login(username, password, callback) {
         msg: "[login]username or password incorrect"
       });
     } else {
-      var cookie = res.header['set-cookie'];
-      callback(null, data.profile, cookie);
+      cookie = res.header['set-cookie'];
+      callback(null, data.bindings);
     }
   });
 }
 
-function sign(type, csrf, callback) {
+function sign(callback) {
   var body = {
-    type: type
+    type: 1
   };
   var encBody = crypto.aesRsaEncrypt(JSON.stringify(body));
-  var url = 'http://music.163.com/weapi/point/dailyTask?csrf_token=' + csrf;
+  var url = 'http://music.163.com/weapi/point/dailyTask';
 
   httpRequest('post', url, encBody, function(err, res) {
     if (err) {
@@ -74,14 +75,13 @@ function sign(type, csrf, callback) {
 }
 
 
-login(PHONE, PASSWORD, function(error, data, cookie) {
+login(PHONE, PASSWORD, function(error, data) {
   if (error) {
     console.log(error.msg);
     return;
   }
 
-  var _csrf = cookie[2].split(';')[0].split('=')[1];
-  sign(data.userType, _csrf, function(error, data) {
+  sign(function(error, data) {
     if (error) {
       console.log(error.msg);
       return;
