@@ -50,32 +50,37 @@ function login(username, password, callback) {
       });
     } else {
       cookie = res.header['set-cookie'];
-      callback(null, data.bindings);
+      callback();
     }
   });
 }
 
 function sign(callback) {
-  var body = {
-    type: 1
-  };
-  var encBody = crypto.aesRsaEncrypt(JSON.stringify(body));
-  var url = 'http://music.163.com/weapi/point/dailyTask';
+  var count = 1;
 
-  httpRequest('post', url, encBody, function(err, res) {
-    if (err) {
-      callback({
-        msg: 'sign in error.'
-      });
-      return;
-    }
-    var data = JSON.parse(res.text);
-    console.log(data);
-  });
+  while (count >= 0) {
+    var body = {
+      type: count
+    };
+    var encBody = crypto.aesRsaEncrypt(JSON.stringify(body));
+    var url = 'http://music.163.com/weapi/point/dailyTask';
+
+    httpRequest('post', url, encBody, function(err, res) {
+      if (err) {
+        callback({
+          msg: 'sign in error.'
+        });
+        return;
+      }
+      var data = JSON.parse(res.text);
+      console.log(data);
+    });
+    count--;
+  }
 }
 
 
-login(PHONE, PASSWORD, function(error, data) {
+login(PHONE, PASSWORD, function(error) {
   if (error) {
     console.log(error.msg);
     return;
@@ -88,5 +93,3 @@ login(PHONE, PASSWORD, function(error, data) {
     }
   });
 });
-
-
