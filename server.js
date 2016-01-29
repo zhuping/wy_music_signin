@@ -1,6 +1,10 @@
+var fs = require('fs');
 var CronJob = require('cron').CronJob;
 var request = require('superagent');
 var crypto = require('./crypto');
+var Console = require('console').Console;
+var output = fs.createWriteStream('./stdout.log');
+var logger = new Console(output);
 
 var cookie;
 var PHONE = 'YOUR_ACCOUNT';
@@ -74,25 +78,25 @@ function sign(callback) {
         return;
       }
       var data = JSON.parse(res.text);
-      console.log(data);
+      logger.log(data);
     });
     count--;
   }
 }
 
-new CronJob('00 30 11 * * 0-6', function() {
+new CronJob('00 42 16 * * 0-6', function() {
   login(PHONE, PASSWORD, function(error) {
     if (error) {
-      console.log(error.msg);
+      logger.log(error.msg);
       return;
     }
     sign(function(error, data) {
       if (error) {
-        console.log(error.msg);
+        logger.log(error.msg);
         return;
       }
     });
   });
 }, function() {
-  console.log('something goes error.');
+  logger.log('something goes error.');
 }, true, 'Asia/Shanghai');
