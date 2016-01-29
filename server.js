@@ -84,7 +84,8 @@ function sign(callback) {
   }
 }
 
-new CronJob('00 42 16 * * 0-6', function() {
+new CronJob('00 30 11 * * 0-6', function() {
+  logger.log('============ %s ===========', new Date());
   login(PHONE, PASSWORD, function(error) {
     if (error) {
       logger.log(error.msg);
