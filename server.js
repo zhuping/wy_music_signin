@@ -6,9 +6,14 @@ var Console = require('console').Console;
 var output = fs.createWriteStream('./stdout.log');
 var logger = new Console(output);
 
+var [ phone, password ] = process.argv.slice(2);
+
+console.log(`Your phone is:`, phone);
+console.log(`Your password is:`, password);
+
 var cookie;
-var PHONE = 'YOUR_ACCOUNT';
-var PASSWORD = 'YOUR_PASSWORD';
+var PHONE = phone;
+var PASSWORD = password;
 var header = {
   'Accept': '*/*',
   'Accept-Encoding': 'gzip,deflate,sdch',
@@ -101,3 +106,5 @@ new CronJob('00 30 11 * * 0-6', function() {
 }, function() {
   logger.log('something goes error.');
 }, true, 'Asia/Shanghai');
+
+console.log('start sign cron');
