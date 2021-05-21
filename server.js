@@ -11,6 +11,7 @@ var [ phone, password ] = process.argv.slice(2);
 console.log(`Your phone is:`, phone);
 console.log(`Your password is:`, password);
 
+var csrf;
 var cookie;
 var PHONE = phone;
 var PASSWORD = password;
@@ -21,11 +22,18 @@ var header = {
   'Connection': 'keep-alive',
   'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
   'Host': 'music.163.com',
-  'Referer': 'http://music.163.com/',
-  'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0'
+  'Referer': 'https://music.163.com/',
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+  "Cookie": "os=pc; osver=Microsoft-Windows-10-Professional-build-10586-64bit; appver=2.0.3.131777; "
 }
 
-var httpRequest = function(method, url, data, callback) {
+var header2 = {
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+  "Referer": "https://music.163.com/",
+  "Accept-Encoding": "gzip, deflate",
+}
+
+var httpRequest = function(method, url, data, header, callback) {
   var ret;
   if (method == 'post') {
     ret = request.post(url).send(data);
@@ -43,9 +51,9 @@ function login(username, password, callback) {
     phone: username
   };
   var encBody = crypto.aesRsaEncrypt(JSON.stringify(body));
-  var url = 'http://music.163.com/weapi/login/cellphone/';
+  var url = 'https://music.163.com/weapi/login/cellphone';
 
-  httpRequest('post', url, encBody, function(err, res) {
+  httpRequest('post', url, encBody, header, function(err, res) {
     if (err) {
       callback({
         msg: '[login]http error ' + err
@@ -60,6 +68,11 @@ function login(username, password, callback) {
       });
     } else {
       cookie = res.header['set-cookie'];
+      cookie.forEach(function(ck) {
+        if (ck.indexOf('__csrf') > -1) {
+          csrf = (ck.match(/__csrf=[^;]+/)[0]) && ck.match(/__csrf=[^;]+/)[0].split('=')[1];
+        }
+      })
       callback();
     }
   });
@@ -73,9 +86,9 @@ function sign(callback) {
       type: count
     };
     var encBody = crypto.aesRsaEncrypt(JSON.stringify(body));
-    var url = 'http://music.163.com/weapi/point/dailyTask';
+    var url = 'https://music.163.com/weapi/point/dailyTask?csrf_token=' + csrf;
 
-    httpRequest('post', url, encBody, function(err, res) {
+    httpRequest('post', url, encBody, header2, function(err, res) {
       if (err) {
         callback({
           msg: 'sign in error.'

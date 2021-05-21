@@ -17,7 +17,7 @@ function addPadding(encText, modulus) {
 }
 
 
-function aesEncrypt(text, secKey) {
+function aesEncrypt(secKey, text) {
   var cipher = crypto.createCipheriv('AES-128-CBC', secKey, '0102030405060708');
   return cipher.update(text, 'utf-8', 'base64') + cipher.final('base64');
 }
@@ -33,7 +33,7 @@ function rsaEncrypt(text, exponent, modulus) {
   var rText = '',
     radix = 16;
   for (var i = text.length - 1; i >= 0; i--) rText += text[i]; //reverse text
-  var biText = bigInt(new Buffer(rText).toString('hex'), radix),
+  var biText = bigInt(Buffer.from(rText).toString('hex'), radix),
     biEx = bigInt(exponent, radix),
     biMod = bigInt(modulus, radix),
     biRet = biText.modPow(biEx, biMod);
@@ -60,8 +60,10 @@ var Crypto = {
   aesRsaEncrypt: function(text) {
     var secKey = createSecretKey(16);
     return {
-      params: aesEncrypt(aesEncrypt(text, nonce), secKey),
-      encSecKey: rsaEncrypt(secKey, pubKey, modulus)
+      params: aesEncrypt('TA3YiYCfY2dDJQgg', aesEncrypt('0CoJUm6Qyw8W8jud', text)),
+      // params: aesEncrypt(aesEncrypt(text, nonce), secKey),
+      encSecKey: '84ca47bca10bad09a6b04c5c927ef077d9b9f1e37098aa3eac6ea70eb59df0aa28b691b7e75e4f1f9831754919ea784c8f74fbfadf2898b0be17849fd656060162857830e241aba44991601f137624094c114ea8d17bce815b0cd4e5b8e2fbaba978c6d1d14dc3d1faf852bdd28818031ccdaaa13a6018e1024e2aae98844210'
+      // encSecKey: rsaEncrypt(secKey, pubKey, modulus)
     }
   }
 };
